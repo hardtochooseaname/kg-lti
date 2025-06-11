@@ -1,0 +1,22 @@
+<script setup>
+const emit = defineEmits(['undo', 'reset-search', 'reset-to-initial']);
+</script>
+
+<template>
+    <div class="actions-container">
+        <h3>图谱操作</h3>
+        <div class="button-group">
+            <button @click="emit('undo')" title="撤销上一步展开">撤销</button>
+            <button @click="emit('reset-search')" title="重置所有展开，恢复到初始搜索结果">重置搜索</button>
+            <button @click="emit('reset-to-initial')" title="返回初始展示的图谱">返回初始图</button>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+.actions-container { padding: 15px; border: 1px solid #eee; border-radius: 8px; background-color: #fafafa; }
+h3 { margin-top: 0; }
+.button-group { display: flex; flex-direction: column; gap: 10px; }
+button { padding: 8px; border-radius: 4px; border: none; background-color: #1890ff; color: white; cursor: pointer; }
+button:hover { background-color: #40a9ff; }
+</style>
