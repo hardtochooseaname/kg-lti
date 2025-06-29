@@ -12,7 +12,7 @@
     <blti:title>课程知识图谱</blti:title>
     <blti:description>一个交互式的知识图谱查看和编辑工具。</blti:description>
     
-    <blti:launch_url>https://3214-132-232-235-155.ngrok-free.app/lti_launch</blti:launch_url>
+    <blti:launch_url>https://132.232.235.155:5173/lti_launch</blti:launch_url>
 
     <!-- <blti:custom>
         <lticm:property name="canvas_user_id">$Canvas.user.id</lticm:property>
@@ -22,7 +22,7 @@
 
     <blti:extensions platform="canvas.instructure.com">
         <lticm:options name="course_navigation">
-            <lticm:property name="url">https://3214-132-232-235-155.ngrok-free.app/lti_launch</lticm:property>
+            <lticm:property name="url">https://132.232.235.155:5173/lti_launch</lticm:property>
             <lticm:property name="text">知识图谱</lticm:property>
             <lticm:property name="visibility">members</lticm:property>
             <lticm:property name="default">enabled</lticm:property>

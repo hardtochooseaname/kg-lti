@@ -1,0 +1,36 @@
+cert.pem
+key.pem
+start_all_dev.sh
+*.log
+pids.txt
+
+# === Rules auto-appended by script on Sun Jun 29 11:04:40 PM CST 2025 ===
+
+# --- Rules from frontend/.gitignore ---
+frontend/logs
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+frontend/node_modules
+frontend/.DS_Store
+frontend/dist
+frontend/dist-ssr
+frontend/coverage
+frontend/*.local
+frontend/cypress/videos/
+frontend/cypress/screenshots/
+frontend/.vscode/*
+!frontend/.vscode/extensions.json
+frontend/.idea
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw?
+frontend/*.tsbuildinfo
+
+# --- Rules from backend/.gitignore ---
+backend/.env

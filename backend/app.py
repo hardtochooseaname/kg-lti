@@ -1,5 +1,6 @@
 from flask import Flask, redirect, request, jsonify, send_from_directory, make_response # 移除了 session
 from neo4j import GraphDatabase, basic_auth
+from neo4j.graph import Relationship, Node
 import os
 from dotenv import load_dotenv # 保留 dotenv
 import mimetypes
@@ -32,6 +33,12 @@ load_dotenv()
 NEO4J_URI = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_USER = os.environ.get("NEO4J_USER", "neo4j")
 NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD", "neo4j_password") # 请确保这里是你的实际密码
+# 从环境变量中获取前端URL
+FRONTEND_URL = os.getenv('FRONTEND_PUBLIC_URL')
+if not FRONTEND_URL:
+    # 如果环境变量没有设置，给一个默认值或抛出错误，防止应用在配置不正确时运行
+    raise ValueError("FRONTEND_PUBLIC_URL environment variable not set!")
+
 
 # --- Neo4j Driver 初始化 ---
 # 描述: 创建一个全局的 Neo4j driver 实例用于后续的数据库会话。
@@ -285,7 +292,15 @@ def is_student_role(roles_str, ext_roles_str=None):
 def direct_access_page():
     """为本地直接开发提供一个默认视图，例如编辑器视图"""
     # 在直接访问时，我们可以默认一个角色，比如 'editor'
-    return redirect(f"http://132.232.235.155:5173/?view_mode=editor")
+    # return redirect(f"https://132.232.235.155:5173/?view_mode=editor")
+    frontend_host = request.headers.get('X-Forwarded-Host') or request.host.replace('5000', '5173')
+    
+    redirect_url = f"https://{frontend_host}?view_mode=editor"
+    
+    app.logger.info(f"Direct access: redirecting to {redirect_url}")
+    
+    return redirect(redirect_url)
+
 
 @app.route('/lti_launch', methods=['POST'])
 def lti_launch():
@@ -305,15 +320,18 @@ def lti_launch():
     
     print(f"LTI Launch: Determined view mode is '{view_mode}'")
 
-    # --- 关键修改：不再渲染模板，而是重定向 ---
-    # 获取前端的访问地址（即你的ngrok/cloudflare隧道地址）
-    # X-Forwarded-Host 头由代理（如ngrok, cloudflare tunnel）设置
-    frontend_host = request.headers.get('X-Forwarded-Host') or request.host.replace('5000', '5173')
+    # # --- 关键修改：不再渲染模板，而是重定向 ---
+    # # 获取前端的访问地址（即你的ngrok/cloudflare隧道地址）
+    # # X-Forwarded-Host 头由代理（如ngrok, cloudflare tunnel）设置
+    # frontend_host = request.headers.get('X-Forwarded-Host') or request.host.replace('5000', '5173')
     
-    # 构造带参数的重定向URL
-    # 注意我们使用 https
-    redirect_url = f"https://{frontend_host}?view_mode={view_mode}"
+    # # 构造带参数的重定向URL
+    # # 注意我们使用 https
+    # redirect_url = f"https://{frontend_host}?view_mode={view_mode}"
     
+    # --- 核心修改：不再动态计算，而是直接使用配置好的URL ---
+    redirect_url = f"{FRONTEND_URL}/?view_mode={view_mode}"
+
     app.logger.info(f"Redirecting LTI launch to: {redirect_url}")
     
     return redirect(redirect_url)
@@ -806,24 +824,7 @@ def search_subgraph():
             db.close()
 
 
-# backend/app.py
 
-# backend/app.py
-
-# backend/app.py
-
-# backend/app.py
-
-# backend/app.py
-
-# backend/app.py
-
-# 确保在文件顶部导入了 neo4j 的数据类型，以便在类型检查时使用
-from neo4j.graph import Relationship, Node
-
-# ... (你其他的app.py代码) ...
-
-# backend/app.py
 
 @app.route('/api/expand/<node_id>', methods=['GET'])
 def expand_node(node_id):
@@ -900,12 +901,25 @@ def expand_node(node_id):
             db.close()
 
 
-
-
 if __name__ == '__main__':
     # 确保 NEO4J_PASSWORD 已在 .env 文件或环境变量中正确设置
     if NEO4J_PASSWORD == "neo4j_password" or not NEO4J_PASSWORD: # 检查是否为默认或未设置
         print("警告: Neo4j 密码可能未正确配置或仍为默认值。请检查 .env 文件或环境变量。")
     
-    # 移除 LTI 特定的 consumers 和 lti_launch 路由 (根据用户要求精简)
-    app.run(debug=True, port=5000, host="0.0.0.0") # 之前建议 5001，这里改回 5000
+    # project_root = os.path.dirname(os.path.abspath(__file__)) + '/../'
+    # cert_path = os.path.join(project_root, 'cert.pem')
+    # key_path = os.path.join(project_root, 'key.pem')
+
+    # print(f"Loading cert from: {cert_path}")
+    # print(f"Loading key from: {key_path}")
+    # # 移除 LTI 特定的 consumers 和 lti_launch 路由 (根据用户要求精简)
+    # # app.run(debug=True, port=5000, host="0.0.0.0") # 之前建议 5001，这里改回 5000
+    # app.run(debug=True, 
+    #         host='0.0.0.0', 
+    #         port=5000, 
+    #         ssl_context=(cert_path, key_path))
+    app.run(
+        host='0.0.0.0', 
+        port=5000, 
+        debug=True
+    )
